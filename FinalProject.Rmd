@@ -1,0 +1,13 @@
+---
+title: "Untitled"
+author: "Caroline Yun"
+date: "4/3/2022"
+output: html_document
+---
+```{r}
+data <- load(file = "chinawomen.rda")
+
+
+
+```
+
