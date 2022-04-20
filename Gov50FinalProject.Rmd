@@ -1,0 +1,180 @@
+---
+title: "Gov50FinalProject"
+author: "Caroline Yun"
+date: "4/16/2022"
+output: pdf_document
+---
+
+```{r}
+chinawomen<-read.csv("chinawomen.csv")
+
+#Birpop and cashcrop
+cor1<-cor(chinawomen$birpop,chinawomen$cashcrop,use="complete.obs")
+cor1
+
+
+lr1<- lm(chinawomen$birpop~chinawomen$cashcrop,data=chinawomen)
+lr1
+
+#Biryr and cashcrop
+cor2<-cor(chinawomen$biryr,chinawomen$cashcrop,use="complete.obs")
+cor2
+
+lr2<- lm(chinawomen$biryr~chinawomen$cashcrop,data=chinawomen)
+lr2
+
+#Sex and cashcrop
+cor3<-cor(chinawomen$sex,chinawomen$cashcrop,use="complete.obs")
+cor3
+
+lr3<- lm(chinawomen$sex~chinawomen$cashcrop,data=chinawomen)
+lr3
+
+#Han and cashcrop
+cor4<-cor(chinawomen$han,chinawomen$cashcrop,use="complete.obs")
+cor4
+
+lr4<- lm(chinawomen$han~chinawomen$cashcrop,data=chinawomen)
+lr4
+
+#summary of cors
+cor1
+cor2
+cor3
+cor4
+
+#summary of lrs
+lr1
+lr2
+lr3
+lr4
+```
+
+
+
+
+```{r}
+data <- read.csv("chinawomen.csv")
+head(data)
+
+
+plot(data$cashcrop, data$han)
+
+
+#subset to before and after reform years, of 1978 and 1980
+#We are 
+data.1978 <- subset(data, biryr == 1978, na.rm = TRUE)
+nrow(data.1978)
+plot(data.1978$cashcrop, data.1978$han)
+
+data.1980 <- subset(data, biryr == 1980)
+nrow(data.1980)
+plot(data.1980$cashcrop, data.1980$han)
+
+#create clustering data
+#We are choosing to cluster data points by how many people lived in the district,l 
+#by the proportion of males, and the quantity of tea crops versus orchard crops sown
+#to see if there are similar qualities high producing or low producing cash crops have
+#will do this for 1980 and 1979 
+
+```
+
+
+```{r}
+two_plot <- na.omit(subset(data.1978, select = c("cashcrop", "han")))
+two <- subset(two_plot, select = c("cashcrop", "han"))
+
+#clustering 
+scale_two <- scale(two)
+cluster <- kmeans(two, centers = 2)
+table(cluster$cluster) #checking the nubmer of observations within each cluster
+
+a <- two[cluster$cluster == 1,]
+b <- two[cluster$cluster == 2,]
+
+#gives the means of each column
+colMeans(a)
+colMeans(b)
+
+
+plot(two_plot$cashcrop, two_plot$han, col = cluster$cluster, xlab = "Cash Crop Quantity", ylab = "Percentage Han" ) 
+
+#better not to have it clustered by too many points
+#Not the easiest graph to read but we can see that doesn't seem to be strong correlations between
+#countries that are producing a lot of ot tea or regions that aren't, but there are more red clusters up top
+
+pcaMod <- prcomp(two_plot)
+biplot(pcaMod)
+
+var_explained = pcaMod$sdev^2 / sum(pcaMod$sdev^2)
+print(var_explained)
+
+plot(var_explained, xlab = "Principal Component", ylab = "Variance Explained", main = "Principal Component Analysis")
+lines(var_explained)
+
+#birthpopulation is explaining a lot of the variation so it is most likely 
+#not han chinese which matters
+#not going in same direction so they don't really go together
+#cash crop explains a lot more of the vartion in the data than han does
+#variation is not trying to show a causal relationship, it's showing
+#why the data points are scattered
+#we would have wanted to see a horizontal component but we didn't
+
+```
+
+
+```{r}
+#Question 2
+#USE THIS CODE
+set.seed(1234)
+#creating the clustering
+#omit ones where han population is too high
+
+two_plot <- na.omit(subset(data.1980, select = c("cashcrop", "han")))
+two <- subset(two_plot, select = c("cashcrop", "han"))
+
+#clustering 
+scale_two <- scale(two)
+cluster <- kmeans(two, centers = 2)
+table(cluster$cluster) #checking the nubmer of observations within each cluster
+
+a <- two[cluster$cluster == 1,]
+b <- two[cluster$cluster == 2,]
+
+#gives the means of each column
+colMeans(a)
+colMeans(b)
+
+
+plot(two_plot$cashcrop, two_plot$han, col = cluster$cluster, xlab = "Cash Crop Quantity", ylab = "Percentage Han" ) 
+
+#better not to have it clustered by too many points
+#Not the easiest graph to read but we can see that doesn't seem to be strong correlations between
+#countries that are producing a lot of ot tea or regions that aren't, but there are more red clusters up top
+
+pcaMod <- prcomp(two_plot)
+biplot(pcaMod)
+
+
+#birthpopulation is explaining a lot of the variation so it is most likely 
+#not han chinese which matters
+#not going in same direction so they don't really go together
+#cash crop explains a lot more of the vartion in the data than han does
+#variation is not trying to show a causal relationship, it's showing
+#why the data points are scattered
+#we would have wanted to see a horizontal component but we didn't
+
+var_explained = pcaMod$sdev^2 / sum(pcaMod$sdev^2)
+print(var_explained)
+
+plot(var_explained, xlab = "Principal Component", ylab = "Variance Explained", main = "Principal Component Analysis")
+lines(var_explained)
+
+```
+
+
+
+#try to find plot to explain which explains the variance in terms of
+#how these variables are grouped
+# bi-plot will tell you which variables explain the most variance 
+
